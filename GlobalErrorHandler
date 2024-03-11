@@ -1,0 +1,48 @@
+package com.rest.errorhandler;
+
+import com.rest.exceptions.ValidateExceptions;
+import com.rest.model.ValidationResponse;
+import net.sf.jmimemagic.MagicException;
+import net.sf.jmimemagic.MagicMatchNotFoundException;
+import net.sf.jmimemagic.MagicParseException;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.MultipartException;
+
+@ControllerAdvice
+
+public class GlobalErrorHandler {
+
+    @ExceptionHandler(value = {MagicParseException.class, MagicException.class,
+            MagicMatchNotFoundException.class})
+    public ResponseEntity<ValidationResponse> errorHandler(Exception ex) {
+        ValidationResponse response = new ValidationResponse();
+        response.setStatusCode("400");
+        response.setStatusMessage("Error");
+        return ResponseEntity.badRequest().body(response);
+ @ExceptionHandler(value = {MaxUploadSizeExceededException.class})
+    public ResponseEntity<ValidationResponse> uploadSizeHandler(Exception ex) {
+        ValidationResponse response = new ValidationResponse();
+        response.setStatusCode("413");
+        response.setStatusMessage("Uploaded size exceeded!");
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(value = {MultipartException.class})
+    public ResponseEntity<ValidationResponse> noFileHandler(Exception ex) {
+        ValidationResponse response = new ValidationResponse();
+        response.setStatusCode("400");
+        response.setStatusMessage("Please upload file!");
+        return ResponseEntity.badRequest().body(response);
+    }
+   @ExceptionHandler(value = {ValidateExceptions.class})
+    public ResponseEntity<ValidationResponse> failureHandler(Exception ex) {
+        ValidationResponse response = new ValidationResponse();
+        response.setStatusCode("400");
+        response.setStatusMessage("Please upload valid file");
+        response.setFileValid(false);
+        return ResponseEntity.badRequest().body(response);
+    }
+}
