@@ -1,0 +1,54 @@
+package com.rest.impl;
+
+import com.rest.exceptions.ValidateExceptions;
+import com.rest.model.ValidationResponse;
+import com.rest.service.FileValidationService;
+import net.sf.jmimemagic.Magic;
+import net.sf.jmimemagic.MagicMatch;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+
+@Service
+public class FileValidationServiceImpl implements FileValidationService {
+    private static final Logger logger = LoggerFactory.getLogger(FileValidationServiceImpl.class);
+
+    @Value("#{'${mime.types}'.split(',')}")
+    private List<String> validMimeTypes;
+
+    @Override
+    public boolean isValidMimeType(String mimeType) {
+        return validMimeTypes.contains(mimeType);
+    }
+
+
+    @Override
+    public ValidationResponse validatefile(MultipartFile file) throws ValidateExceptions {
+        try {
+            logger.info("Test");
+            MagicMatch magicMatch = Magic.getMagicMatch(file.getBytes());
+            String detectedMimeType = magicMatch.getMimeType();
+
+            if (!isValidMimeType(detectedMimeType)) {
+                throw new ValidateExceptions();
+            }
+        } catch (Exception e) {
+            logger.error("An error occurred during file validation", e);
+
+//            System.out.println(e);
+            throw new ValidateExceptions();
+
+        }
+        ValidationResponse response = new ValidationResponse();
+        response.setStatusCode("200");
+        response.setStatusMessage("SUCCESS");
+        response.setFileValid(true);
+        return response;
+    }
+
+}
+
