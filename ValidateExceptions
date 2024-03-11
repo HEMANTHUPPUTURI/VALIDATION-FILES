@@ -1,0 +1,20 @@
+package com.rest.exceptions;
+
+public class ValidateExceptions extends RuntimeException {
+    public ValidateExceptions() {
+        super();
+    }
+
+    public ValidateExceptions(String message) {
+        super(message);
+    }
+
+    public ValidateExceptions(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public ValidateExceptions(Throwable cause) {
+        super(cause);
+    }
+
+}
